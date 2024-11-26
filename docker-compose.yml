@@ -1,0 +1,27 @@
+services:
+  postgres:
+    image: postgres
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_DB=company
+      - POSTGRES_USER=company
+      - POSTGRES_PASSWORD=company
+  company:
+    build: .
+    image: company
+    command: ["uvicorn", "src.main:app", "--host", "0.0.0.0", "--port", "8080", "--reload"]
+    ports:
+      - "8080:8080"
+    volumes:
+      - .:/var/company
+    depends_on:
+      - postgres
+    environment:
+      - DATABASE_URL=postgresql://company:company@postgres/company
+  docs:
+    image: nginx:alpine
+    ports:
+      - "8000:80"
+    volumes:
+      - ./docs/build/:/usr/share/nginx/html
